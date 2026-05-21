@@ -1,5 +1,5 @@
 ﻿import React, { useState } from 'react';
-import { THEME_COLORS } from '../constants/colors';
+import {THEME_COLORS} from "@/app/constants/colors";
 
 interface FlashcardProps {
     card: {
@@ -15,7 +15,7 @@ const Flashcard = ({ card }: FlashcardProps) => {
     return (
         <div
             style={{ backgroundColor: flipped ? THEME_COLORS.flashcardBgFlipped : THEME_COLORS.flashcardBg }}
-            className="p-12 min-h-[320px] flex flex-col justify-center items-center text-center cursor-pointer select-none transition-colors"
+            className="p-12 min-h-80 flex flex-col justify-center items-center text-center cursor-pointer select-none transition-colors"
             onClick={() => setFlipped(!flipped)}
         >
       <span className="px-3 py-1 bg-white border-2 border-black rounded-full font-bold text-xs uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">

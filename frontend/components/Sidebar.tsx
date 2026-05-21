@@ -1,5 +1,5 @@
 ﻿import React from 'react';
-import { THEME_COLORS } from '../constants/colors'; // Import your global theme colors
+import {THEME_COLORS} from "@/app/constants/colors";
 
 const Sidebar = () => {
     const stats = [
