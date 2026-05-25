@@ -1,44 +1,43 @@
 ﻿'use client';
 
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import FlashCard from "@/components/FlashCard";
 import StudyNavigation from "@/components/StudyNavigation";
 import StudyControls from "@/components/StudyControls";
 import {THEME_COLORS} from "@/app/constants/colors";
-
-interface Card {
-    id: number;
-    question: string;
-    answer: string;
-    category: string;
-}
-
-const MOCK_CARDS: Card[] = [
-    {
-        id: 1,
-        question: "What does HTML stand for?",
-        answer: "Hypertext Markup Language",
-        category: "Web Development"
-    },
-    {
-        id: 2,
-        question: "What is the purpose of the useEffect hook in React?",
-        answer: "To handle side effects in functional components, such as data fetching, subscriptions, or manual DOM manipulations.",
-        category: "Web Development"
-    }
-];
+import {Flashcard} from "@/app/constants/types";
 
 const StudyPage = () => {
+    const [cards, setCards] = useState<Flashcard[]>([]);
     const [currentCardIndex, setCurrentCardIndex] = useState(0);
-    const currentCard = MOCK_CARDS[currentCardIndex];
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetch('http://localhost:5059/flashcards')
+            .then(res => res.json())
+            .then(data => {
+                setCards(data);
+                setLoading(false);
+            })
+            .catch(err => console.error("Error fetching cards:", err));
+    }, []);
 
     const handleNext = () => {
-        setCurrentCardIndex((prev) => (prev + 1) % MOCK_CARDS.length);
+        if (cards.length > 0) {
+            setCurrentCardIndex((prev) => (prev + 1) % cards.length);
+        }
     };
 
     const handlePrevious = () => {
-        setCurrentCardIndex((prev) => (prev - 1 + MOCK_CARDS.length) % MOCK_CARDS.length);
+        if (cards.length > 0) {
+            setCurrentCardIndex((prev) => (prev - 1 + cards.length) % cards.length);
+        }
     };
+
+    if (loading) return <div>Loading your study deck...</div>;
+    if (cards.length === 0) return <div>No cards found in your collection.</div>;
+
+    const currentCard = cards[currentCardIndex];
 
     return (
 
@@ -54,7 +53,8 @@ const StudyPage = () => {
                     onPrevious={handlePrevious}
                     onNext={handleNext}
                     currentIndex={currentCardIndex}
-                    totalCards={MOCK_CARDS.length}/>
+                    totalCards={cards.length}
+                />
             </section>
         </>
         

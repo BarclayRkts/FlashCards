@@ -44,5 +44,8 @@ export const THEME_COLORS = {
         mastered: '#2dd4bf',    // Vibrant Mint Teal
         inProgress: '#ff7bc2',  // Pop Neon Pink
         notStarted: '#facc15',  // Brutal Yellow
-    }
+    },
+    
+    inputBg: '#FDF6E3',
+    
 } as const;

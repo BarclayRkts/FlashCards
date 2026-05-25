@@ -1,15 +1,12 @@
 ﻿import React, { useState } from 'react';
 import {THEME_COLORS} from "@/app/constants/colors";
+import type { Flashcard } from "@/app/constants/types";
 
-interface FlashcardProps {
-    card: {
-        question: string;
-        answer: string;
-        category: string;
-    };
+interface FlashCardProps {
+    card: Flashcard;
 }
 
-const Flashcard = ({ card }: FlashcardProps) => {
+const Flashcard = ({ card }: FlashCardProps) => {
     const [flipped, setFlipped] = useState(false);
 
     return (
@@ -19,10 +16,10 @@ const Flashcard = ({ card }: FlashcardProps) => {
             onClick={() => setFlipped(!flipped)}
         >
       <span className="px-3 py-1 bg-white border-2 border-black rounded-full font-bold text-xs uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-        {card.category}
+        {card.category?.name ?? "No Category"}
       </span>
             <h2 className="text-3xl font-black mt-6 max-w-xl leading-snug text-black">
-                {flipped ? card.answer : card.question}
+                {flipped ? card.backSide : card.frontSide}
             </h2>
             <p className="text-xs font-bold text-black/60 mt-6 uppercase tracking-widest animate-pulse">
                 {flipped ? "Click to see question" : "Click to reveal answer"}
