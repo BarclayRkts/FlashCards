@@ -52,5 +52,24 @@ public static class FlashCardsEndpoints
             return Results.CreatedAtRoute(GetFlashCardEndpointName, new {id = newFlashCard.Id}, newFlashCard);
         });
         
+        group.MapGet("/stats", (AppDbContext dbContext) =>
+        {
+            var stats = dbContext.FlashCards
+                .GroupBy(f => f.Status)
+                .Select(g => new 
+                {
+                    Status = g.Key,
+                    Count = g.Count()
+                })
+                .ToList();
+
+            return Results.Ok(new {
+                Total = dbContext.FlashCards.Count(),
+                Mastered = stats.FirstOrDefault(s => s.Status == "Mastered")?.Count ?? 0,
+                InProgress = stats.FirstOrDefault(s => s.Status == "In Progress")?.Count ?? 0,
+                NotStarted = stats.FirstOrDefault(s => s.Status == "Not Started")?.Count ?? 0
+            });
+        });
+        
     }
 }

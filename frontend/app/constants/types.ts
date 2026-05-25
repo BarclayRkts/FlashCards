@@ -9,9 +9,16 @@ export interface Flashcard {
     frontSide: string;
     backSide: string;
     categoryId: number;
-    category: Category | null; // This matches the object coming back from your API
+    category: Category | null;
     status: string;
     createdAt: string;
     updatedAt: string | null;
     frontImage: string | null;
+}
+
+export interface StudyStats {
+    total: number;
+    mastered: number;
+    inProgress: number;
+    notStarted: number;
 }

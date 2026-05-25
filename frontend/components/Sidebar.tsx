@@ -1,12 +1,23 @@
-﻿import React from 'react';
+﻿import React, {useEffect, useState} from 'react';
 import {THEME_COLORS} from "@/app/constants/colors";
+import {StudyStats} from "@/app/constants/types";
 
 const Sidebar = () => {
+
+    const [statsData, setStatsData] = useState<StudyStats | null>(null);
+
+    useEffect(() => {
+        fetch('http://localhost:5059/flashcards/stats')
+            .then((res) => res.json())
+            .then((data) => setStatsData(data))
+            .catch((err) => console.error("Error fetching stats:", err));
+    }, []);
+    
     const stats = [
-        { label: 'Total Cards', count: 50, color: THEME_COLORS.stats.totalCards, icon: '📚' },
-        { label: 'Mastered', count: 11, color: THEME_COLORS.stats.mastered, icon: '🧠' },
-        { label: 'In Progress', count: 21, color: THEME_COLORS.stats.inProgress, icon: '📖' },
-        { label: 'Not Started', count: 8, color: THEME_COLORS.stats.notStarted, icon: '📥' },
+        { label: 'Total Cards', count: statsData?.total, color: THEME_COLORS.stats.totalCards, icon: '📚' },
+        { label: 'Mastered', count: statsData?.mastered, color: THEME_COLORS.stats.mastered, icon: '🧠' },
+        { label: 'In Progress', count: statsData?.inProgress, color: THEME_COLORS.stats.inProgress, icon: '📖' },
+        { label: 'Not Started', count: statsData?.notStarted, color: THEME_COLORS.stats.notStarted, icon: '📥' },
     ];
 
     return (
