@@ -24,12 +24,11 @@ public static class FlashCardsEndpoints
         });
         
         group.MapGet("/{id}", (int id, AppDbContext dbContext) =>
-            {
-                var flashCard = dbContext.FlashCards.Find(id);
-                
-                return flashCard is not null ? Results.Ok(flashCard) : Results.NotFound();
-            })
-            .WithName(GetFlashCardEndpointName);
+        {
+            var flashCard = dbContext.FlashCards.Find(id);
+            
+            return flashCard is not null ? Results.Ok(flashCard) : Results.NotFound();
+        }).WithName(GetFlashCardEndpointName);
 
 
         group.MapPost("/create", (CreateFlashCardDto createFlashCardDtoDto, AppDbContext dbContext) =>
@@ -50,6 +49,22 @@ public static class FlashCardsEndpoints
             dbContext.SaveChanges();
             
             return Results.CreatedAtRoute(GetFlashCardEndpointName, new {id = newFlashCard.Id}, newFlashCard);
+        });
+        
+        group.MapDelete("/{id}", async (int id, AppDbContext dbContext) =>
+        {
+            var flashcard = await dbContext.FlashCards.FindAsync(id);
+            
+            if (flashcard == null)
+            {
+                return Results.NotFound(new { message = $"Flashcard with ID {id} not found." });
+            }
+            
+            dbContext.FlashCards.Remove(flashcard);
+            
+            await dbContext.SaveChangesAsync();
+
+            return Results.NoContent();
         });
         
         group.MapGet("/stats", (AppDbContext dbContext) =>

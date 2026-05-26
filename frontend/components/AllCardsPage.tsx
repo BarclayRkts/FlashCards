@@ -20,6 +20,22 @@ const AllCardsPage = () => {
     const closeModal = () => {
         setIsOpen(false);
     }
+
+    const deleteCard = async (id: number) => {
+        try {
+            const response = await fetch(`http://localhost:5059/flashcards/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                setCards(cards.filter((card: any) => card.id !== id));
+            } else {
+                console.error("Failed to delete the card");
+            }
+        } catch (err) {
+            console.error("Error:", err);
+        }
+    };
     
     return (
         <section
@@ -43,7 +59,7 @@ const AllCardsPage = () => {
                 </button>
             </div>
             
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 overflow-y-auto pr-2 max-h-125">
                 {cards.map((card: any) => (
                     <div key={card.id} className="flex items-center gap-4 p-4 border-2 border-black rounded-xl bg-white">
                         <input type="checkbox" className="w-5 h-5" />
@@ -60,7 +76,7 @@ const AllCardsPage = () => {
                         </span>
                         <div className="flex gap-2">
                             <button className="p-2 border-2 border-black rounded-lg">✏️</button>
-                            <button className="p-2 border-2 border-black rounded-lg">🗑️</button>
+                            <button className="p-2 border-2 border-black rounded-lg" onClick={() => deleteCard(card.id)}>🗑️</button>
                         </div>
                     </div>
                 ))}
