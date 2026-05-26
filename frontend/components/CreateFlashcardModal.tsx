@@ -5,9 +5,10 @@ import NewCategoryModal from "@/components/NewCategoryModal";
 interface Props {
     isOpen: boolean;
     onClose: () => void;
+    onSuccess: () => void;
 }
 
-const CreateFlashcardModal = ({isOpen, onClose}: Props) => {
+const CreateFlashcardModal = ({isOpen, onClose, onSuccess}: Props) => {
     const [categories, setCategories] = useState([]);
     const baseURL = "http://localhost:5059";
     const [showNewCategoryModal, setShowNewCategoryModal] = useState(false);
@@ -59,6 +60,7 @@ const CreateFlashcardModal = ({isOpen, onClose}: Props) => {
                 throw new Error(`Error: ${response.statusText}`);
             }
             
+            onSuccess();
             if (onClose) onClose();
 
         } catch (error) {

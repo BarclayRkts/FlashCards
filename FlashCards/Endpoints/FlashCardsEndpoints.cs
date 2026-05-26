@@ -3,6 +3,7 @@ using FlashCards.DTO;
 using FlashCards.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FlashCards.Endpoints;
 
@@ -51,19 +52,19 @@ public static class FlashCardsEndpoints
             return Results.CreatedAtRoute(GetFlashCardEndpointName, new {id = newFlashCard.Id}, newFlashCard);
         });
         
-        group.MapDelete("/{id}", async (int id, AppDbContext dbContext) =>
+        group.MapDelete("/delete", async ([FromBody] int[] ids, AppDbContext dbContext) =>
         {
-            var flashcard = await dbContext.FlashCards.FindAsync(id);
-            
-            if (flashcard == null)
-            {
-                return Results.NotFound(new { message = $"Flashcard with ID {id} not found." });
-            }
-            
-            dbContext.FlashCards.Remove(flashcard);
-            
-            await dbContext.SaveChangesAsync();
+            var queryable = dbContext.FlashCards.AsQueryable();
 
+            var cardsToDelete = await queryable
+                .Where(f => ids.Contains(f.Id))
+                .ToListAsync();
+
+            if (cardsToDelete.Count == 0) return Results.NotFound();
+
+            dbContext.FlashCards.RemoveRange(cardsToDelete);
+            await dbContext.SaveChangesAsync();
+    
             return Results.NoContent();
         });
         

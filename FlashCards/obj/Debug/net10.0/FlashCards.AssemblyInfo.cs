@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FlashCards")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6ca0ebb9b9dbce2abb50b92e1c87bf7a1238e635")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+20ee4387513649877077d565a0eb239a0266a171")]
 [assembly: System.Reflection.AssemblyProductAttribute("FlashCards")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FlashCards")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

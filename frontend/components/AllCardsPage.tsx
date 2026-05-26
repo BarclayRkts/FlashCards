@@ -1,14 +1,18 @@
 ﻿'use client';
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import { THEME_COLORS } from "@/app/constants/colors";
 import CreateFlashcardModal from "@/components/CreateFlashcardModal";
+import FlashcardItem from "@/components/FlashCardItem";
+import {Flashcard} from "@/app/constants/types";
 
 
 const AllCardsPage = () => {
     
     const [isOpen, setIsOpen] = useState(false);
-    const [cards, setCards] = useState([]);
+    const [cards, setCards] = useState<Flashcard[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
     useEffect(() => {
         fetch('http://localhost:5059/flashcards')
@@ -21,21 +25,47 @@ const AllCardsPage = () => {
         setIsOpen(false);
     }
 
-    const deleteCard = async (id: number) => {
+    const fetchCards = async () => {
+        const res = await fetch('http://localhost:5059/flashcards');
+        const data = await res.json();
+        setCards(data);
+    }
+
+    const toggleSelection = (id: number) => {
+        setSelectedIds(prev =>
+            prev.includes(id)
+                ? prev.filter(i => i !== id)
+                : [...prev, id]
+        );
+    };
+
+    const deleteCards = async (ids: number[]) => {
         try {
-            const response = await fetch(`http://localhost:5059/flashcards/${id}`, {
+            const response = await fetch('http://localhost:5059/flashcards/delete', {
                 method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(ids),
             });
 
             if (response.ok) {
-                setCards(cards.filter((card: any) => card.id !== id));
+                setCards(prevCards => prevCards.filter(card => !ids.includes(card.id)));
+                if (typeof setSelectedIds === 'function') setSelectedIds([]);
             } else {
-                console.error("Failed to delete the card");
+                console.error("Failed to delete cards");
             }
         } catch (err) {
-            console.error("Error:", err);
+            console.error("Error during deletion:", err);
         }
     };
+
+    const filteredCards = useMemo(() => {
+        return cards.filter((card: any) =>
+            card.frontSide.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            card.backSide.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }, [cards, searchQuery]);
     
     return (
         <section
@@ -52,37 +82,30 @@ const AllCardsPage = () => {
                 <input
                     type="text"
                     placeholder="Search flashcards..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                     className="flex-1 p-3 border-2 border-black rounded-xl"
                 />
-                <button className="px-6 py-3 border-2 border-black rounded-xl font-bold hover:bg-gray-50">
-                    Bulk Actions ▾
+                <button className="px-6 py-3 border-2 border-black rounded-xl font-bold hover:bg-gray-50"
+                        onClick={() => deleteCards(selectedIds)}
+                >
+                    Delete Selected
                 </button>
             </div>
             
             <div className="flex flex-col gap-4 overflow-y-auto pr-2 max-h-125">
-                {cards.map((card: any) => (
-                    <div key={card.id} className="flex items-center gap-4 p-4 border-2 border-black rounded-xl bg-white">
-                        <input type="checkbox" className="w-5 h-5" />
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg border-2 border-black flex items-center justify-center">
-                            {/* Icon placeholder */}
-                            🖼️
-                        </div>
-                        <div className="flex-1">
-                            <p className="font-bold">{card.frontSide}</p>
-                            <p className="text-sm text-gray-600">{card.backSide}</p>
-                        </div>
-                        <span className="px-3 py-1 border-2 border-black rounded-full text-xs font-bold">
-                            {card.category?.name || "No Category"}
-                        </span>
-                        <div className="flex gap-2">
-                            <button className="p-2 border-2 border-black rounded-lg">✏️</button>
-                            <button className="p-2 border-2 border-black rounded-lg" onClick={() => deleteCard(card.id)}>🗑️</button>
-                        </div>
-                    </div>
+                {filteredCards.map((card: any) => (
+                    <FlashcardItem
+                        key={card.id}
+                        card={card}
+                        onDelete={(id) => deleteCards([id])}
+                        isSelected={selectedIds.includes(card.id)}
+                        onToggleSelect={() => toggleSelection(card.id)}
+                    />
                 ))}
             </div>
 
-            {isOpen && <CreateFlashcardModal isOpen={isOpen} onClose={closeModal}/>}
+            {isOpen && <CreateFlashcardModal isOpen={isOpen} onClose={closeModal} onSuccess={fetchCards}/>}
 
             <button
                 className="w-full mt-8 py-4 border-2 border-black rounded-xl font-black text-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-yellow-100 transition-colors"
