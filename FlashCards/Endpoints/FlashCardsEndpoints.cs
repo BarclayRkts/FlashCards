@@ -102,5 +102,25 @@ public static class FlashCardsEndpoints
             return Results.NoContent();
         });
         
+        group.MapPut("/{id}", async (int id, UpdateFlashcardDto updateDto, AppDbContext dbContext) =>
+        {
+            var card = await dbContext.FlashCards.FindAsync(id);
+    
+            if (card == null)
+            {
+                return Results.NotFound();
+            }
+
+            card.Name = updateDto.Name;
+            card.FrontSide = updateDto.FrontSide;
+            card.BackSide = updateDto.BackSide;
+            card.CategoryId = updateDto.CategoryId;
+            card.Status = updateDto.Status;
+    
+            await dbContext.SaveChangesAsync();
+
+            return Results.NoContent();
+        });
+        
     }
 }

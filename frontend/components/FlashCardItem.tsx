@@ -6,9 +6,10 @@ interface FlashcardItemProps {
     onDelete: (id: number) => void;
     isSelected: boolean;
     onToggleSelect: () => void;
+    onEdit: () => void;
 }
 
-const FlashcardItem = ({ card, onDelete, isSelected, onToggleSelect }: FlashcardItemProps) => {
+const FlashcardItem = ({ card, onDelete, isSelected, onToggleSelect, onEdit }: FlashcardItemProps) => {
     return (
         <div className="flex items-center gap-4 p-4 border-2 border-black rounded-xl bg-white">
             <input
@@ -28,7 +29,7 @@ const FlashcardItem = ({ card, onDelete, isSelected, onToggleSelect }: Flashcard
                 {card.category?.name || "No Category"}
             </span>
             <div className="flex gap-2">
-                <button className="p-2 border-2 border-black rounded-lg">✏️</button>
+                <button className="p-2 border-2 border-black rounded-lg" onClick={onEdit}>✏️</button>
                 <button
                     className="p-2 border-2 border-black rounded-lg"
                     onClick={() => onDelete(card.id)}

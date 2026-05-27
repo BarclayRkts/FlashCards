@@ -1,23 +1,39 @@
 ﻿import {useEffect, useState} from 'react';
 import {THEME_COLORS} from "@/app/constants/colors";
 import NewCategoryModal from "@/components/NewCategoryModal";
+import {Flashcard} from "@/app/constants/types";
 
 interface Props {
     isOpen: boolean;
     onClose: () => void;
     onSuccess: () => void;
+    isEdit?: boolean;
+    cardToEdit: Flashcard;
 }
 
-const CreateFlashcardModal = ({isOpen, onClose, onSuccess}: Props) => {
+const CreateFlashcardModal = ({isOpen, onClose, onSuccess, isEdit, cardToEdit}: Props) => {
     const [categories, setCategories] = useState([]);
     const baseURL = "http://localhost:5059";
     const [showNewCategoryModal, setShowNewCategoryModal] = useState(false);
     const [formData, setFormData] = useState({
-        backSide: '',
-        frontSide: '',
-        categoryId: 0,
-        status: 'Not Started'
+        BackSide: '',
+        FrontSide: '',
+        CategoryId: 0,
+        Status: 'Not Started',
+        Name: ''
     });
+    
+    useEffect(() => {
+        if (isEdit) {
+            setFormData({
+                BackSide: cardToEdit.backSide,
+                FrontSide: cardToEdit.frontSide,
+                CategoryId: cardToEdit.categoryId,
+                Status: cardToEdit.status,
+                Name: cardToEdit.name,
+            });
+        }
+    }, [cardToEdit]);
 
     useEffect(() => {
         fetch(`${baseURL}/categories`)
@@ -38,18 +54,21 @@ const CreateFlashcardModal = ({isOpen, onClose, onSuccess}: Props) => {
     };
 
     const handleSave = async (): Promise<void> => {
+        const isEditing = !!cardToEdit;
+        const url = isEditing ? `${baseURL}/flashcards/${cardToEdit.id}` : `${baseURL}/flashcards/create`;
+        const method = isEditing ? 'PUT' : 'POST';
 
         const payload = {
-            name: "",
-            categoryId: Number(formData.categoryId),
-            frontSide: formData.frontSide,
-            backSide: formData.backSide,
-            status: formData.status
+            Name: "",
+            CategoryId: Number(formData.CategoryId),
+            FrontSide: formData.FrontSide,
+            BackSide: formData.BackSide,
+            Status: formData.Status,
         };
-        console.log(payload);
+
         try {
-            const response = await fetch(`${baseURL}/flashcards/create`, {
-                method: 'POST',
+            const response = await fetch(url, {
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -59,7 +78,7 @@ const CreateFlashcardModal = ({isOpen, onClose, onSuccess}: Props) => {
             if (!response.ok) {
                 throw new Error(`Error: ${response.statusText}`);
             }
-            
+
             onSuccess();
             if (onClose) onClose();
 
@@ -74,33 +93,26 @@ const CreateFlashcardModal = ({isOpen, onClose, onSuccess}: Props) => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
             <div
                 className="bg-white rounded-3xl border-4 border-black p-8 w-full max-w-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                <h2 className="text-2xl font-black mb-6">CREATE NEW FLASHCARD</h2>
+                <h2 className="text-2xl font-black mb-6">{cardToEdit ? "EDIT FLASHCARD" : "CREATE NEW FLASHCARD"}</h2>
 
                 <div className="flex gap-6">
                     <div className="flex-1 space-y-4">
                         <div>
                             <label className="font-bold">FRONT (QUESTION):</label>
-                            <textarea name="frontSide"
+                            <textarea name="FrontSide"
+                                      value={formData.FrontSide}
                                       style={{ backgroundColor: THEME_COLORS.inputBg }}
                                       className="w-full border-2 border-black rounded-lg p-3 mt-1"
                                       onChange={handleChange}/>
                         </div>
                         <div>
                             <label className="font-bold">BACK (ANSWER):</label>
-                            <textarea name="backSide"
+                            <textarea name="BackSide"
                                       style={{ backgroundColor: THEME_COLORS.inputBg }}
+                                      value={formData.BackSide}
                                       className="w-full border-2 border-black rounded-lg p-3 mt-1"
                                       onChange={handleChange}/>
                         </div>
-                    </div>
-
-                    <div className="w-32 flex flex-col items-center">
-                        <div
-                            style={{ backgroundColor: THEME_COLORS.inputBg }}
-                            className="w-full h-32 border-2 border-black rounded-xl flex items-center justify-center mb-2">
-                            📷
-                        </div>
-                        <span className="text-xs text-center font-bold">Upload Front Image (Optional)</span>
                     </div>
                 </div>
 
@@ -117,11 +129,11 @@ const CreateFlashcardModal = ({isOpen, onClose, onSuccess}: Props) => {
                     <label className="font-bold">CATEGORY :</label>
                     <div className="flex items-center gap-2">
                     <select
-                        name="categoryId"
+                        name="CategoryId"
                         className="w-full p-3 border-2 border-black rounded-lg font-bold"
                         style={{backgroundColor: THEME_COLORS.inputBg}}
                         onChange={handleChange}
-                        defaultValue="0"
+                        value={formData.CategoryId}
                     >
                         <option value="0" disabled>
                             Select a Category
@@ -148,7 +160,7 @@ const CreateFlashcardModal = ({isOpen, onClose, onSuccess}: Props) => {
                     <div className="flex gap-4">
                         {['Not Started', 'In Progress', 'Mastered'].map((status) => (
                             <label key={status} className="flex items-center gap-2 font-bold">
-                                <input type="radio" name="status" value={status} onChange={handleChange}/>
+                                <input type="radio" name="Status" value={status} onChange={handleChange} checked={(formData.Status || '') === status}/>
                                 {status}
                             </label>
                         ))}
@@ -162,8 +174,8 @@ const CreateFlashcardModal = ({isOpen, onClose, onSuccess}: Props) => {
                     <button
                         style={{backgroundColor: THEME_COLORS.accentYellow}}
                         className="flex-1 py-3 border-2 border-black rounded-lg font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                        onClick={handleSave}>Submit
-                        Save & Create
+                        onClick={handleSave}
+                    >Submit Save & Create
                     </button>
                 </div>
             </div>

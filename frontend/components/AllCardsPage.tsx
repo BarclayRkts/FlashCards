@@ -13,6 +13,7 @@ const AllCardsPage = () => {
     const [cards, setCards] = useState<Flashcard[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
+    const [editingCard, setEditingCard] = useState<Flashcard | null>(null);
 
     useEffect(() => {
         fetch('http://localhost:5059/flashcards')
@@ -60,6 +61,11 @@ const AllCardsPage = () => {
         }
     };
 
+    const openEditModal = (card: Flashcard) => {
+        setEditingCard(card);
+        setIsOpen(true);
+    };
+
     const filteredCards = useMemo(() => {
         return cards.filter((card: any) =>
             card.frontSide.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -101,11 +107,13 @@ const AllCardsPage = () => {
                         onDelete={(id) => deleteCards([id])}
                         isSelected={selectedIds.includes(card.id)}
                         onToggleSelect={() => toggleSelection(card.id)}
+                        onEdit={() => openEditModal(card)}
                     />
                 ))}
             </div>
 
-            {isOpen && <CreateFlashcardModal isOpen={isOpen} onClose={closeModal} onSuccess={fetchCards}/>}
+            {isOpen && <CreateFlashcardModal isOpen={isOpen} onClose={closeModal} onSuccess={fetchCards} isEdit={!!editingCard}
+                                             cardToEdit={editingCard as Flashcard}/>}
 
             <button
                 className="w-full mt-8 py-4 border-2 border-black rounded-xl font-black text-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-yellow-100 transition-colors"
