@@ -7,6 +7,7 @@ import StudyControls from "@/components/StudyControls";
 import {THEME_COLORS} from "@/app/constants/colors";
 import {Flashcard} from "@/app/constants/types";
 import { useStudyLogic } from "@/hooks/useStudyLogic";
+import StudyStatus from "@/components/StudyStatus";
 
 const StudyPage = () => {
     const [cards, setCards] = useState<Flashcard[]>([]);
@@ -43,6 +44,30 @@ const StudyPage = () => {
         return acc;
     }, {} as Record<number, number>);
 
+    const handleUpdateStatus = async (newStatus: string) => {
+        if (!currentCard) return;
+
+        try {
+            const response = await fetch(`${baseURL}/flashcards/${currentCard.id}/status`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: newStatus }),
+            });
+
+            if (response.ok) {
+                setCards(prevCards => prevCards.map(card =>
+                    card.id === currentCard.id ? { ...card, status: newStatus } : card
+                ));
+            } else {
+                console.error("Failed to update status");
+            }
+        } catch (err) {
+            console.error("Error connecting to backend:", err);
+        }
+    };
+
     if (loading) return <div>Loading...</div>;
     const currentCard = displayCards[currentIndex];
 
@@ -69,6 +94,8 @@ const StudyPage = () => {
                     currentIndex={currentIndex}
                     totalCards={displayCards.length}
                 />
+
+                <StudyStatus onStatusChange={handleUpdateStatus} currentStatus={currentCard?.status || 'Not Started'}/>
             </section>
         </>
         

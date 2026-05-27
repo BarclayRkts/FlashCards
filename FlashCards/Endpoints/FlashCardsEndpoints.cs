@@ -87,5 +87,20 @@ public static class FlashCardsEndpoints
             });
         });
         
+        group.MapPatch("/{id}/status", async (int id, StatusUpdateDto statusDto, AppDbContext dbContext) =>
+        {
+            var card = await dbContext.FlashCards.FindAsync(id);
+    
+            if (card == null)
+            {
+                return Results.NotFound();
+            }
+
+            card.Status = statusDto.Status;
+            await dbContext.SaveChangesAsync();
+
+            return Results.NoContent();
+        });
+        
     }
 }

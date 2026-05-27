@@ -148,7 +148,7 @@ const CreateFlashcardModal = ({isOpen, onClose, onSuccess}: Props) => {
                     <div className="flex gap-4">
                         {['Not Started', 'In Progress', 'Mastered'].map((status) => (
                             <label key={status} className="flex items-center gap-2 font-bold">
-                                <input type="radio" name="status" value={status}/>
+                                <input type="radio" name="status" value={status} onChange={handleChange}/>
                                 {status}
                             </label>
                         ))}
