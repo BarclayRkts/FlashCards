@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
-        policy => policy.WithOrigins("http://localhost:3000", "https://flash-cards-one-sigma.vercel.app/")
+        policy => policy.WithOrigins("http://localhost:3000", "https://flash-cards-one-sigma.vercel.app/", "https://flash-cards-one-sigma.vercel.app")
             .AllowAnyHeader()
             .AllowAnyMethod());
 });
