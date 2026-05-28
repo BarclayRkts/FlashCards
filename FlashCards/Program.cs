@@ -17,7 +17,7 @@ var app = builder.Build();
 
 app.UseCors("AllowFrontend");
 
-app.MigrateDatabase();
+// app.MigrateDatabase();
 
 app.UseHttpsRedirection();
 
