@@ -16,7 +16,7 @@ const AllCardsPage = () => {
     const [editingCard, setEditingCard] = useState<Flashcard | null>(null);
 
     useEffect(() => {
-        fetch('http://localhost:5059/flashcards')
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/flashcards`)
             .then(res => res.json())
             .then(data => setCards(data))
             .catch(err => console.error("Error fetching cards:", err));
@@ -27,7 +27,7 @@ const AllCardsPage = () => {
     }
 
     const fetchCards = async () => {
-        const res = await fetch('http://localhost:5059/flashcards');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/flashcards`);
         const data = await res.json();
         setCards(data);
     }
@@ -42,7 +42,7 @@ const AllCardsPage = () => {
 
     const deleteCards = async (ids: number[]) => {
         try {
-            const response = await fetch('http://localhost:5059/flashcards/delete', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/flashcards/delete`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

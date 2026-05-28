@@ -7,7 +7,7 @@ const Sidebar = () => {
     const [statsData, setStatsData] = useState<StudyStats | null>(null);
 
     useEffect(() => {
-        fetch('http://localhost:5059/flashcards/stats')
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/flashcards/stats`)
             .then((res) => res.json())
             .then((data) => setStatsData(data))
             .catch((err) => console.error("Error fetching stats:", err));

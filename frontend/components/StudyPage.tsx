@@ -11,7 +11,6 @@ import StudyStatus from "@/components/StudyStatus";
 
 const StudyPage = () => {
     const [cards, setCards] = useState<Flashcard[]>([]);
-    let baseURL = "http://localhost:5059";
     const [loading, setLoading] = useState(true);
     const [categories, setCategories] = useState([]);
 
@@ -21,7 +20,7 @@ const StudyPage = () => {
     } = useStudyLogic(cards);
 
     useEffect(() => {
-        fetch(`${baseURL}/flashcards`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/flashcards`)
             .then(res => res.json())
             .then(data => {
                 setCards(data);
@@ -31,7 +30,7 @@ const StudyPage = () => {
     }, []);
 
     useEffect(() => {
-        fetch(`${baseURL}/categories`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`)
             .then(res => res.json())
             .then(data => {
                 setCategories(data);
@@ -48,7 +47,7 @@ const StudyPage = () => {
         if (!currentCard) return;
 
         try {
-            const response = await fetch(`${baseURL}/flashcards/${currentCard.id}/status`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/flashcards/${currentCard.id}/status`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

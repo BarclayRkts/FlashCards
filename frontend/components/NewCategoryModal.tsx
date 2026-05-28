@@ -1,11 +1,10 @@
 ﻿import {useState} from "react";
 
 const NewCategoryModal = ({ onClose, onSave }: any) => {
-    const baseURL = "http://localhost:5059";
     const [name, setName] = useState("");
 
     const handleCreate = async () => {
-        const response = await fetch(`${baseURL}/categories/create`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories/create`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name }),

@@ -13,7 +13,6 @@ interface Props {
 
 const CreateFlashcardModal = ({isOpen, onClose, onSuccess, isEdit, cardToEdit}: Props) => {
     const [categories, setCategories] = useState([]);
-    const baseURL = "http://localhost:5059";
     const [showNewCategoryModal, setShowNewCategoryModal] = useState(false);
     const [formData, setFormData] = useState({
         BackSide: '',
@@ -36,7 +35,7 @@ const CreateFlashcardModal = ({isOpen, onClose, onSuccess, isEdit, cardToEdit}: 
     }, [cardToEdit]);
 
     useEffect(() => {
-        fetch(`${baseURL}/categories`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`)
             .then(res => res.json())
             .then(data => setCategories(data))
             .catch(err => console.error("Error fetching categories:", err));
@@ -48,14 +47,14 @@ const CreateFlashcardModal = ({isOpen, onClose, onSuccess, isEdit, cardToEdit}: 
     };
 
     const fetchCategories = async () => {
-        const res = await fetch(`${baseURL}/categories`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`);
         const data = await res.json();
         setCategories(data);
     };
 
     const handleSave = async (): Promise<void> => {
         const isEditing = !!cardToEdit;
-        const url = isEditing ? `${baseURL}/flashcards/${cardToEdit.id}` : `${baseURL}/flashcards/create`;
+        const url = isEditing ? `${process.env.NEXT_PUBLIC_API_URL}/flashcards/${cardToEdit.id}` : `${process.env.NEXT_PUBLIC_API_URL}/flashcards/create`;
         const method = isEditing ? 'PUT' : 'POST';
 
         const payload = {
