@@ -26,40 +26,30 @@ public static class DataExtensions
         else
         {
             var sqliteConnectionString = builder.Configuration.GetConnectionString("FlashCardStore");
-            builder.Services.AddSqlite<AppDbContext>(sqliteConnectionString, optionsAction: options =>
-                options.UseSeeding((context, _) =>
-                {
-                    if (!context.Set<Category>().Any())
-                    {
-                        var csharp = new Category { Name = "C# Basics" };
-                        var webDevelopment = new Category { Name = "Web Development" };
+            builder.Services.AddSqlite<AppDbContext>(sqliteConnectionString); 
+        }
 
-                        context.Set<Category>().AddRange(csharp, webDevelopment);
-                        context.SaveChanges();
-                    
-                        context.Set<FlashCard>().AddRange(
-                            new FlashCard 
-                            { 
-                                Name = "EF Core Basics", 
-                                FrontSide = "What is a DbSet?", 
-                                BackSide = "Represents a collection of entities", 
-                                Status = "Not Started", 
-                                CreatedAt = DateTime.UtcNow,
-                                Category = csharp 
-                            },
-                            new FlashCard 
-                            { 
-                                Name = "EF Core Migrations", 
-                                FrontSide = "What is a Migration?", 
-                                BackSide = "Schema evolution tool", 
-                                Status = "In Progress", 
-                                CreatedAt = DateTime.UtcNow,
-                                Category = webDevelopment 
-                            }
-                        );
-                        context.SaveChanges();
-                    }
-                }));
+    }
+    
+    public static void SeedData(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        
+        dbContext.Database.Migrate();
+        
+        if (!dbContext.Set<Category>().Any())
+        {
+            var csharp = new Category { Name = "C# Basics" };
+            var webDevelopment = new Category { Name = "Web Development" };
+            dbContext.Set<Category>().AddRange(csharp, webDevelopment);
+            dbContext.SaveChanges();
+
+            dbContext.Set<FlashCard>().AddRange(
+                new FlashCard { Name = "EF Core Basics", FrontSide = "What is a DbSet?", BackSide = "Represents a collection of entities", Status = "Not Started", CreatedAt = DateTime.UtcNow, Category = csharp },
+                new FlashCard { Name = "EF Core Migrations", FrontSide = "What is a Migration?", BackSide = "Schema evolution tool", Status = "In Progress", CreatedAt = DateTime.UtcNow, Category = webDevelopment }
+            );
+            dbContext.SaveChanges();
         }
     }
 }
