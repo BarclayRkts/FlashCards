@@ -12,15 +12,17 @@ interface Props {
 }
 
 const CreateFlashcardModal = ({isOpen, onClose, onSuccess, isEdit, cardToEdit}: Props) => {
-    const [categories, setCategories] = useState([]);
-    const [showNewCategoryModal, setShowNewCategoryModal] = useState(false);
-    const [formData, setFormData] = useState({
+
+    const initialState = {
         BackSide: '',
         FrontSide: '',
         CategoryId: 0,
         Status: 'Not Started',
         Name: ''
-    });
+    };
+    const [categories, setCategories] = useState([]);
+    const [showNewCategoryModal, setShowNewCategoryModal] = useState(false);
+    const [formData, setFormData] = useState(initialState);
     
     useEffect(() => {
         if (isEdit) {
@@ -77,7 +79,8 @@ const CreateFlashcardModal = ({isOpen, onClose, onSuccess, isEdit, cardToEdit}: 
             if (!response.ok) {
                 throw new Error(`Error: ${response.statusText}`);
             }
-
+            
+            setFormData(initialState);
             onSuccess();
             if (onClose) onClose();
 
